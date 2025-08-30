@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CodeFixer.AI Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <div class="sidebar-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">CodeFixer.AI</div>
+      <nav>
+        <ul>
+          <nav>
+  <ul>
+    <li><a href="profile.html">Profile</a></li>
+    <li><a href="home.html">Dashboard</a></li>
+    <li><a href="code-debugger.html">Code Debugger</a></li>
+    <li><a href="quizzes.html">Quizzes</a></li>
+    <li><a href="learn.html">Code Learning</a></li>
+    <li><a href="#" id="logout-btn">Logout</a></li>
+  </ul>
+</nav>
+
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header class="main-header">
+        <h2>Welcome to CodeFixer.AI!</h2>
+      </header>
+      <!-- Put your main dashboard/cards here -->
+       <section class="progress-overview">
+  <h3>User Progress Overview</h3>
+  <div class="progress-card">
+    <div class="progress-details">
+      <div class="progress-item">
+        <span class="progress-label">Level</span>
+        <span class="progress-value" id="user-level">3</span>
+      </div>
+      <div class="progress-item">
+        <span class="progress-label">Quizzes Completed</span>
+        <span class="progress-value" id="quizzes-completed">12</span>
+      </div>
+      <div class="progress-item">
+        <span class="progress-label">Achievements</span>
+        <span class="progress-value" id="user-badges">🐞 🏆 🌟</span>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <span class="progress-label">Progress to Next Level</span>
+      <div class="progress-bar-bg">
+        <div class="progress-bar" id="progress-bar" style="width: 65%;"></div>
+      </div>
+      <span class="progress-status" id="progress-status">65%</span>
+    </div>
+  </div>
+</section>
+
+<section class="badges-section">
+  <h3>Your Achievements</h3>
+  <div class="badges-grid">
+    <div class="badge unlocked">
+      <span class="badge-icon">🐞</span>
+      <span class="badge-title">Bug Hunter</span>
+      <span class="badge-desc">Debugged 10 errors!</span>
+    </div>
+    <div class="badge unlocked">
+      <span class="badge-icon">🏆</span>
+      <span class="badge-title">Quiz Master</span>
+      <span class="badge-desc">Completed 5 quizzes!</span>
+    </div>
+    <div class="badge unlocked">
+      <span class="badge-icon">🌟</span>
+      <span class="badge-title">Level Up!</span>
+      <span class="badge-desc">Reached Level 3!</span>
+    </div>
+    <div class="badge locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-title">Logic Legend</span>
+      <span class="badge-desc">Solve 10 logic puzzles</span>
+    </div>
+    <div class="badge locked">
+      <span class="badge-icon">🔒</span>
+      <span class="badge-title">Challenge Hero</span>
+      <span class="badge-desc">Complete all weekly challenges</span>
+    </div>
+  </div>
+</section>
+
+<section class="notifications-section">
+  <h3>Notifications & Announcements</h3>
+  <div class="notifications-list">
+    <div class="notification info">
+      <span class="notification-icon">ℹ️</span>
+      <span class="notification-text">New: Debug Java and C++ code—multi-language support now live!</span>
+      <span class="notification-time">Just now</span>
+    </div>
+    <div class="notification update">
+      <span class="notification-icon">🚀</span>
+      <span class="notification-text">Challenge mode unlocked. Level up to earn exclusive badges!</span>
+      <span class="notification-time">2 days ago</span>
+    </div>
+    <div class="notification tip">
+      <span class="notification-icon">💡</span>
+      <span class="notification-text">Tip: Use the Quizzes tab to practice logic and boost your rank.</span>
+      <span class="notification-time">This week</span>
+    </div>
+  </div>
+</section>
+
+<section class="statistics-section">
+  <h3>Your Stats</h3>
+  <div class="statistics-grid">
+    <!-- Stat Card 1 -->
+    <div class="stat-card">
+      <span class="stat-icon">📈</span>
+      <div>
+        <div class="stat-value" id="debugged-errors">47</div>
+        <div class="stat-label">Errors Debugged</div>
+      </div>
+    </div>
+    <!-- Stat Card 2 -->
+    <div class="stat-card">
+      <span class="stat-icon">🧩</span>
+      <div>
+        <div class="stat-value" id="quizzes-passed">22</div>
+        <div class="stat-label">Quizzes Passed</div>
+      </div>
+    </div>
+    <!-- Stat Card 3 -->
+    <div class="stat-card">
+      <span class="stat-icon">⏱️</span>
+      <div>
+        <div class="stat-value" id="best-time">2m 13s</div>
+        <div class="stat-label">Best Debug Time</div>
+      </div>
+    </div>
+    <!-- Stat Card 4 -->
+    <div class="stat-card">
+      <span class="stat-icon">📊</span>
+      <div>
+        <div class="stat-value" id="logic-puzzles">7</div>
+        <div class="stat-label">Logic Puzzles Solved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional: Simple Progress Pie/Bar (easy to upgrade to Chart.js later) -->
+  <div class="simple-chart-container">
+    <div class="simple-chart-label">Quiz Accuracy</div>
+    <div class="simple-bar-bg">
+      <div class="simple-bar" style="width: 80%;"></div>
+    </div>
+    <span class="simple-bar-value">80%</span>
+  </div>
+</section>
+
+
+
+    </main>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div class="modal" id="logout-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to logout?</p>
+      <button class="modal-yes" id="logout-yes">Yes</button>
+      <button class="modal-no" id="logout-no">No</button>
+    </div>
+  </div>
+
+
+  <script src="script.js"></script>
+</body>
+</html>

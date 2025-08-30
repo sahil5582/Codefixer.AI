@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Profile | CodeFixer.AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sidebar-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">CodeFixer.AI</div>
+      <nav>
+        <ul>
+          <li class="active"><a href="profile.html">Profile</a></li>
+          <li><a href="home.html">Dashboard</a></li>
+          <li><a href="code-debugger.html">Code Debugger</a></li>
+          <li><a href="quizzes.html">Quizzes</a></li>
+          <li><a href="learn.html">Code Learning</a></li>
+          <li><a href="#" id="logout-btn">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header class="main-header">
+        <h2>User Profile</h2>
+      </header>
+      <section class="profile-section">
+        <div class="profile-card">
+          
+          <img src="default-avatar.png" id="profile-avatar" alt="Avatar" class="profile-avatar">
+          <h3 id="profile-username">Username</h3>
+          <p id="profile-bio">Your coding journey starts here!</p>
+          <div class="profile-details">
+            <span id="profile-user-detail"><strong>Username:</strong></span>
+            <span id="profile-lang-detail"><strong>Favorite Language:</strong> Python</span>
+          </div>
+          <textarea id="profile-bio-edit" rows="2" placeholder="Update your bio"></textarea>
+          <input type="text" id="profile-lang-edit" placeholder="Favorite Language">
+          <button id="save-profile-btn" class="primary-btn">Save Profile</button>
+        </div>
+        <div class="profile-stats">
+          <h4>Your Stats</h4>
+          <ul>
+            <li id="stat-quizzes">Quizzes Completed: 0</li>
+            <li id="stat-bugs">Bugs Fixed: 0</li>
+            <li id="stat-badges">Badges Earned: <span class="badge">🌟</span></li>
+          </ul>
+          <div class="badges-section">
+            <h4>Achievements</h4>
+            <span class="badge">🐞 Bug Hunter</span>
+            <span class="badge">🏆 Quiz Master</span>
+            <span class="badge">🌟 Rising Coder</span>
+          </div>
+        </div>
+        <div class="progress-section">
+          <label>Quizzes Done (0/20)</label>
+          <div class="simple-bar-bg">
+            <div class="simple-bar" id="profile-progress-bar"></div>
+          </div>
+          <span id="profile-progress-label">0%</span>
+        </div>
+        <div class="activity-feed">
+          <h4>Recent Activity</h4>
+          <ul id="activity-list">
+            <!-- Activity items dynamically inserted -->
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+  <!-- LOGOUT MODAL -->
+  <div class="modal" id="logout-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to logout?</p>
+      <button class="modal-yes" id="logout-yes">Yes</button>
+      <button class="modal-no" id="logout-no">No</button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const username = localStorage.getItem("cf_username") || "Guest";
+      document.getElementById("profile-username").textContent = username;
+      document.getElementById("profile-user-detail").textContent = "Username: " + username;
+
+      const avatar = localStorage.getItem('cf_avatar');
+      if (avatar) document.getElementById('profile-avatar').src = avatar;
+
+      document.getElementById('profile-bio-edit').value = localStorage.getItem('cf_bio') || "";
+      document.getElementById('profile-lang-edit').value = localStorage.getItem('cf_lang') || "";
+      document.getElementById('profile-bio').textContent = localStorage.getItem('cf_bio') || "Your coding journey starts here!";
+      document.getElementById('profile-lang-detail').textContent = "Favorite Language: " + (localStorage.getItem('cf_lang') || 'Python');
+
+      let quizzes = parseInt(localStorage.getItem("cf_quizzes") || "0");
+      let bugs = parseInt(localStorage.getItem("cf_bugs") || "0");
+      document.getElementById("stat-quizzes").textContent = "Quizzes Completed: " + quizzes;
+      document.getElementById("stat-bugs").textContent = "Bugs Fixed: " + bugs;
+
+      let percent = Math.round((quizzes / 20) * 100);
+      document.getElementById("profile-progress-bar").style.width = percent + "%";
+      document.getElementById("profile-progress-label").textContent = percent + "%";
+
+      let badges = ["🌟"];
+      if (quizzes >= 5) badges.push("🏆");
+      if (bugs >= 5) badges.push("🐞");
+      let badgeHTML = badges.map(b => '<span class="badge">' + b + '</span>').join(' ');
+      document.getElementById("stat-badges").innerHTML = "Badges Earned: " + badgeHTML;
+
+      let activityArr = [];
+      try {
+        activityArr = JSON.parse(localStorage.getItem("cf_activity") || "[]");
+      } catch { activityArr = []; }
+      const actList = document.getElementById('activity-list');
+      actList.innerHTML = "";
+      activityArr.forEach(msg => {
+        const el = document.createElement('li');
+        el.textContent = msg;
+        actList.appendChild(el);
+      });
+    });
+
+    document.getElementById('save-profile-btn').onclick = function() {
+      localStorage.setItem('cf_bio', document.getElementById('profile-bio-edit').value || "");
+      localStorage.setItem('cf_lang', document.getElementById('profile-lang-edit').value || "");
+      document.getElementById('profile-bio').textContent = document.getElementById('profile-bio-edit').value || "Your coding journey starts here!";
+      document.getElementById('profile-lang-detail').textContent = "Favorite Language: " + (document.getElementById('profile-lang-edit').value || "Python");
+      addActivity("Updated profile ("+ new Date().toLocaleDateString() +")");
+    };
+
+    function addActivity(msg) {
+      let activityArr = [];
+      try { activityArr = JSON.parse(localStorage.getItem("cf_activity") || "[]"); } catch { activityArr = []; }
+      activityArr.unshift(msg);
+      if (activityArr.length > 10) activityArr = activityArr.slice(0,10);
+      localStorage.setItem("cf_activity", JSON.stringify(activityArr));
+      const el = document.createElement('li');
+      el.textContent = msg;
+      document.getElementById('activity-list').prepend(el);
+    }
+
+    if (!localStorage.getItem("cf_activity")) {
+      localStorage.setItem("cf_activity", JSON.stringify([
+        "Welcome to CodeFixer.AI profile!",
+        "Earn badges by fixing bugs and completing quizzes."
+      ]));
+    }
+
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('logout-modal').style.display = 'flex';
+    });
+    document.getElementById('logout-no').addEventListener('click', function() {
+      document.getElementById('logout-modal').style.display = 'none';
+    });
+    document.getElementById('logout-yes').addEventListener('click', function() {
+      document.getElementById('logout-modal').style.display = 'none';
+      localStorage.clear();
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

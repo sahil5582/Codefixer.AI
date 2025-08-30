@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizzes | CodeFixer.AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sidebar-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">CodeFixer.AI</div>
+      <nav>
+        <ul>
+          <nav>
+  <ul>
+    <li><a href="profile.html">Profile</a></li>
+    <li><a href="home.html">Dashboard</a></li>
+    <li><a href="code-debugger.html">Code Debugger</a></li>
+    <li><a href="quizzes.html">Quizzes</a></li>
+    <li><a href="learn.html">Code Learning</a></li>
+    <li><a href="#" id="logout-btn">Logout</a></li>
+  </ul>
+</nav>
+
+
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header class="main-header">
+        <h2>Quizzes</h2>
+        <p>Test your coding logic and unlock new achievements. Select a quiz to begin!</p>
+      </header>
+
+      <section class="quizzes-list">
+        <div class="quiz-card">
+          <h3>Python Basics</h3>
+          <p>10 quick questions about Python syntax and concepts.</p>
+          <button class="primary-btn">Start Quiz</button>
+        </div>
+        <div class="quiz-card">
+          <h3>JavaScript Logic</h3>
+          <p>Challenge your knowledge of JS flows, functions, and arrays.</p>
+          <button class="primary-btn">Start Quiz</button>
+        </div>
+        <div class="quiz-card">
+          <h3>Error Debugger</h3>
+          <p>Find and fix code errors in sample problems.</p>
+          <button class="primary-btn">Start Quiz</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Optional: Logout Modal, same as dashboard -->
+  <div class="modal" id="logout-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to logout?</p>
+      <button class="modal-yes" id="logout-yes">Yes</button>
+      <button class="modal-no" id="logout-no">No</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

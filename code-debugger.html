@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CodeFixer.AI | Code Debugger</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <style>
+    /* Mini tweaks for output/history/align */
+    .output-history {
+      background: #f6edff;
+      border-radius: 8px;
+      margin-top: 18px;
+      padding: 14px;
+      min-height: 54px;
+      font-size: 0.98rem;
+      color: #2d3436;
+      box-shadow: 0 0 8px rgba(44,62,80,.06);
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .output-label { color: #6c5ce7; font-weight: 500; margin-bottom: 6px; display:block;}
+    .download-btn { margin-top:9px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar-layout">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">CodeFixer.AI</div>
+      <nav>
+        <ul>
+            <li><a href="profile.html">Profile</a></li>
+          <li><a href="home.html">Dashboard</a></li>
+          <li class="active"><a href="code-debugger.html">Code Debugger</a></li>
+          <li><a href="quizzes.html">Quizzes</a></li>
+          <li><a href="learn.html">Code Learning</a></li>
+          <li><a href="#" id="logout-btn">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <header class="main-header">
+        <h2>Code Debugger</h2>
+        <p>Edit code, select a language, then Run, Fix, Copy, or Download your code.<br>
+        Your previous outputs are saved below for review.</p>
+      </header>
+      <section class="dashboard-section">
+        <div class="card" style="width:100%;max-width:700px;">
+          <!-- Example/template tabs -->
+          <div class="example-tabs" style="margin-bottom:12px;">
+            <span class="progress-label" style="margin-right:10px;">Quick Templates:</span>
+            <button class="secondary-btn" onclick="setExample('javascript')">JS: Hello</button>
+            <button class="secondary-btn" onclick="setExample('python')">Python: Hello</button>
+            <button class="secondary-btn" onclick="setExample('java')">Java: Hello</button>
+          </div>
+          <label for="languageSelect" class="progress-label" style="margin-top:7px">Language</label>
+          <select id="languageSelect" style="margin-bottom:14px;">
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="cpp">C++</option>
+            <option value="csharp">C#</option>
+            <option value="go">Go</option>
+            <option value="ruby">Ruby</option>
+          </select>
+
+          <div id="editor" style="height:300px;width:100%;border-radius:8px;"></div>
+
+          <div class="controls" style="margin-top:14px;">
+            <button id="runBtn" class="primary-btn">Run</button>
+            <button id="fixBtn" class="primary-btn">Fix Code</button>
+            <button id="copyBtn" class="primary-btn">Copy</button>
+            <button class="primary-btn download-btn" onclick="downloadCode()" id="downloadBtn">Download</button>
+          </div>
+          <div class="output" id="outputPanel" style="height:70px;margin-top:12px;">Output will appear here.</div>
+          <span class="output-label">Output History</span>
+          <div class="output-history" id="outputHistory"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- LOGOUT MODAL -->
+  <div class="modal" id="logout-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to logout?</p>
+      <button class="modal-yes" id="logout-yes">Yes</button>
+      <button class="modal-no" id="logout-no">No</button>
+    </div>
+  </div>
+
+  <script>
+    // Example code templates per language
+    const examples = {
+      javascript: `function sayHello(name) {
+  return "Hello, " + name + "!";
+}
+console.log(sayHello("World"));`,
+
+      python: `def say_hello(name):
+    return "Hello, " + name + "!"
+print(say_hello("World"))`,
+
+      java: `public class Main {
+  public static void main(String[] args){
+    System.out.println("Hello, World!");
+  }
+}`,
+
+      cpp: `#include <iostream>
+int main() {
+  std::cout << "Hello, World!\\n";
+}`,
+
+      csharp: `using System;
+class Program {
+  static void Main() {
+    Console.WriteLine("Hello, World!");
+  }
+}`,
+
+      go: `package main
+import "fmt"
+func main() {
+  fmt.Println("Hello, World!")
+}`,
+
+      ruby: `puts "Hello, World!"`
+    };
+
+    let editor = null;
+    // Monaco editor setup
+    window.require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+    window.require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('editor'), {
+        value: examples.javascript,
+        language: 'javascript',
+        theme: 'vs-dark',
+        automaticLayout: true,
+        fontFamily: 'Fira Mono, Consolas, monospace',
+        minimap: { enabled: false }
+      });
+      document.getElementById('languageSelect').addEventListener('change', function(){
+        setExample(this.value);
+      });
+      setExample(document.getElementById('languageSelect').value);
+    });
+
+    function setExample(lang) {
+      const snippet = examples[lang] || '';
+      if (editor) {
+        monaco.editor.setModelLanguage(editor.getModel(), lang);
+        editor.setValue(snippet);
+      }
+      document.getElementById('outputPanel').textContent = 'Output will appear here.';
+    }
+
+    function getCode() {
+      return editor ? editor.getValue() : '';
+    }
+
+    // Output panel and history
+    const outputPanel = document.getElementById('outputPanel');
+    const outputHistory = document.getElementById('outputHistory');
+
+    function addToHistory(out) {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.textContent = `[${timestamp}] ${out}`;
+      outputHistory.prepend(entry);
+      // Optionally limit history length
+      while (outputHistory.children.length > 7) {
+        outputHistory.removeChild(outputHistory.lastChild);
+      }
+    }
+
+    // Run button: Only runs JS in-browser, others show mock info
+    document.getElementById('runBtn').addEventListener('click', function() {
+      const lang = document.getElementById('languageSelect').value;
+      let result;
+      if (lang === 'javascript') {
+        let logs = [];
+        const originalLog = console.log;
+        try {
+          console.log = (...args) => logs.push(args.map(a => String(a)).join(' '));
+          new Function(getCode())();
+          result = logs.length ? logs.join('\n') : '(no console output)';
+        } catch (err) {
+          result = "Error:\n" + err.message;
+        } finally {
+          console.log = originalLog;
+        }
+      } else {
+        result = lang.charAt(0).toUpperCase() + lang.slice(1) + " code can't run in browser demo.";
+      }
+      outputPanel.textContent = result;
+      addToHistory(result);
+    });
+
+    // Fix Code button (mock demo)
+    document.getElementById('fixBtn').addEventListener('click', function() {
+      outputPanel.textContent = "No auto-fixes available in demo.";
+      addToHistory("No auto-fixes available.");
+    });
+
+    // Copy button
+    document.getElementById('copyBtn').addEventListener('click', function() {
+      navigator.clipboard.writeText(getCode()).then(function(){
+        outputPanel.textContent = "✅ Code copied to clipboard.";
+        addToHistory("Code copied to clipboard.");
+      });
+    });
+
+    // Download button
+    window.downloadCode = function() {
+      const lang = document.getElementById('languageSelect').value;
+      const code = getCode();
+      const ext = {
+        javascript: "js",
+        python: "py",
+        java: "java",
+        cpp: "cpp",
+        csharp: "cs",
+        go: "go",
+        ruby: "rb"
+      }[lang] || "txt";
+      const filename = "code." + ext;
+      const blob = new Blob([code], {type: "text/plain"});
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      outputPanel.textContent = "⬇️ Code downloaded as " + filename;
+      addToHistory("Code downloaded.");
+    };
+
+    // Logout Modal Handlers
+    document.getElementById('logout-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('logout-modal').style.display = 'flex';
+    });
+    document.getElementById('logout-no').addEventListener('click', function() {
+      document.getElementById('logout-modal').style.display = 'none';
+    });
+    document.getElementById('logout-yes').addEventListener('click', function() {
+      document.getElementById('logout-modal').style.display = 'none';
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
