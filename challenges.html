@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeFixer.AI – Challenges</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:600,700&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f8f9fa;
+    }
+    .sidebar-layout {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      background: #29313B;
+      color: white;
+      width: 250px;
+      padding: 28px 0 0 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sidebar-logo {
+      font-weight: 700;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+    }
+    .sidebar nav ul li {
+      margin: 10px 0;
+    }
+    .sidebar nav ul li a {
+      color: #fff;
+      font-size: 1.1rem;
+      text-decoration: none;
+      display: block;
+      padding: 11px 32px;
+      border-radius: 10px 0 0 10px;
+      transition: background 0.2s;
+    }
+    .sidebar nav ul li a:hover, .sidebar nav ul li a.active {
+      background: #414A5A;
+    }
+    main {
+      flex-grow: 1;
+      padding: 48px 36px;
+      background: #f6f7fb;
+      min-width: 0;
+      min-height: 100vh;
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #29313b;
+    }
+    .subtitle {
+      color: #636b7b;
+      margin-bottom: 32px;
+      font-size: 1.1rem;
+    }
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .quiz-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(62,99,226,0.04);
+      padding: 32px 28px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      max-width: 660px;
+      border: 1px solid #e3e6ed;
+    }
+    .quiz-title {
+      color: #6e4fd0;
+      font-weight: 700;
+      font-size: 1.27rem;
+      margin-bottom: 8px;
+    }
+    .quiz-desc {
+      color: #454d5e;
+      font-size: 1.04rem;
+      margin-bottom: 22px;
+      margin-top: 0;
+    }
+    .quiz-meta {
+      font-size: 0.97rem;
+      color: #73809a;
+      margin-bottom: 14px;
+    }
+    .primary-btn {
+      background: #29313B;
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      font-size: 1.13rem;
+      border-radius: 10px;
+      padding: 12px 34px;
+      margin-top: 8px;
+      cursor: pointer;
+      transition: box-shadow 0.15s, background 0.15s;
+      box-shadow: 0 2px 5px rgba(90,120,200,0.07);
+    }
+    .primary-btn:hover {
+      background: #414A5A;
+    }
+    .error {
+      color: red;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">CodeFixer.AI</div>
+      <nav>
+        <ul>
+          <li><a href="profile.html">Profile</a></li>
+          <li><a href="home.html">Dashboard</a></li>
+          <li><a href="code-debugger.html">Code Debugger</a></li>
+          <li><a href="quizzes.html">Quizzes</a></li>
+          <li><a href="learn.html">Code Learning</a></li>
+          <li><a href="challenges.html" class="active">Challenges</a></li>
+          <li><a href="#" id="logout-btn">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main>
+      <h1>Challenges</h1>
+      <div class="subtitle">
+        Test your coding skills with real-world challenges and quizzes.<br>
+        Attempt and improve your logic, code understanding, and mastery!
+      </div>
+      <div id="quiz-list" class="quiz-list"></div>
+      <div id="error-message" class="error"></div>
+    </main>
+  </div>
+
+  <script>
+    const quizListEl = document.getElementById('quiz-list');
+    const errorMessageEl = document.getElementById('error-message');
+
+    async function fetchQuizzes() {
+      try {
+        const response = await fetch('/api/quizzes');
+        if (!response.ok) {
+          errorMessageEl.textContent = 'Failed to load challenges. Please try again later.';
+          return;
+        }
+        const data = await response.json();
+        renderQuizzes(data.quizzes);
+      } catch (error) {
+        errorMessageEl.textContent = 'Network error. Please try again later.';
+      }
+    }
+
+    function renderQuizzes(quizzes) {
+      if (!quizzes.length) {
+        quizListEl.innerHTML = `<div style="color:#888;font-size:1.15rem;">No challenges available right now.</div>`;
+        return;
+      }
+      quizListEl.innerHTML = '';
+      quizzes.forEach(quiz => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+
+        card.innerHTML = `
+          <div class="quiz-title">${quiz.title}</div>
+          <div class="quiz-desc">${quiz.description || ''}</div>
+          <div class="quiz-meta">
+            Difficulty: ${quiz.difficulty || 'N/A'} | Attempts: ${quiz.attempts_count}
+          </div>
+          <button class="primary-btn">Start Challenge</button>
+        `;
+        card.querySelector('.primary-btn').onclick = () =>
+          window.location.href = `/quiz.html?id=${quiz.id}`;
+        quizListEl.appendChild(card);
+      });
+    }
+
+    fetchQuizzes();
+
+    document.getElementById('logout-btn').onclick = () => {
+      // Clear any token and redirect, even if no login required now
+      localStorage.removeItem('authToken');
+      window.location.href = 'login.html';
+    };
+  </script>
+</body>
+</html> 

@@ -80,3 +80,46 @@ if (signupForm) {
       });
   });
 }
+
+const quizData = {
+  python: [
+    {
+      question: "What is the output of print(2**3)?",
+      options: ["5", "6", "8", "9"],
+      answer: 2 // Index of correct option
+    },
+    // ...more questions
+  ],
+  js: [
+    // ...JS logic questions
+  ],
+  debugger: [
+    // ...Error Debugger problems (could show buggy code for user to fix)
+  ]
+};
+
+document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const quizType = btn.dataset.quiz;
+    startQuiz(quizType);
+  });
+});
+
+function startQuiz(type) {
+  const questions = quizData[type];
+  // Render first question, handle answer checking, progress, and scoring
+}
+
+document.querySelectorAll('.start-quiz-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const quizType = btn.getAttribute('data-quiz');
+    startQuiz(quizType);
+  });
+});
+
+function startQuiz(type) {
+  alert("Starting the " + type + " quiz!");
+  // Add modal or page navigation here
+}
+
+

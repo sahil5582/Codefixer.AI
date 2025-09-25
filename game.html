@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ReadyMate — Reaction Time Game</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#06b6d4;
+      --accent-2:#a78bfa;
+      --text:#e6eef8;
+      --muted:#9fb0c6;
+      --danger:#ff6b6b;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#051428 0%, #071833 60%, #071433 100%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .container{
+      width:100%;
+      max-width:760px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:28px;
+      box-shadow:0 8px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;font-weight:700;font-size:20px;color:#041022;
+      box-shadow:0 6px 20px rgba(7,18,28,0.6);
+    }
+    h1{margin:0;font-size:20px}
+    p.lead{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .game{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1fr 240px;
+      gap:18px;
+    }
+    .panel{
+      background:var(--card);
+      border-radius:12px;
+      padding:18px;
+      min-height:220px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      text-align:center;
+    }
+    .status{
+      width:100%;
+      height:120px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      font-weight:700;
+      user-select:none; 
+      transition:all .18s ease;
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+      border:1px solid rgba(255,255,255,0.02);
+      padding:12px;
+    }
+    .status.ready{ color:var(--accent-2); }
+    .status.waiting{ color:var(--muted); font-size:22px; }
+    .status.go{ background:linear-gradient(180deg,#ecfccb,#bbf7d0); color:#063f1a; box-shadow:0 8px 28px rgba(34,197,94,0.08); }
+    .status.bad{ background:linear-gradient(180deg,#ffe6e6,#ffd1d1); color:#711111; box-shadow:0 8px 28px rgba(255,107,107,0.06); }
+    .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+    button{
+      background:transparent;border:1px solid rgba(255,255,255,0.06);
+      color:var(--text);
+      padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+      transition:transform .08s ease, background .12s ease;
+    }
+    button.primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#041022;border:0;box-shadow:0 8px 22px rgba(7,20,40,0.4);
+    }
+    button:active{transform:translateY(1px)}
+    .stats{display:flex;flex-direction:column;gap:10px;width:100%}
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .muted{color:var(--muted);font-size:13px}
+    .big{font-size:28px;font-weight:800}
+    .footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+    .small{font-size:12px;color:var(--muted)}
+    .hint{font-size:13px;color:var(--muted)}
+    @media (max-width:740px){
+      .game{grid-template-columns:1fr;align-items:stretch}
+      .panel{min-height:140px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <div class="title">
+      <div class="logo">RM</div>
+      <div>
+        <h1>ReadyMate</h1>
+        <p class="lead">Test your reflexes — click or press <strong>Space</strong> when it turns <em>GO!</em></p>
+      </div>
+    </div>
+
+    <div class="game" aria-live="polite">
+      <div class="panel" id="leftPanel">
+        <div id="statusBox" class="status waiting" aria-atomic="true">Press <strong>Start</strong> to begin</div>
+
+        <div class="controls">
+          <button id="startBtn" class="primary">Start</button>
+          <button id="stopBtn">Stop</button>
+          <button id="resetBtn">Reset Best</button>
+        </div>
+
+        <div class="footer">
+          <div class="hint">False start? Click/press too early and you'll see a penalty.</div>
+          <div class="small" style="margin-top:8px">Rounds played: <span id="roundCount">0</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="rightPanel" style="align-items:stretch">
+        <div class="stats" role="status" aria-live="polite">
+          <div class="stat"><div class="muted">Last time</div><div id="lastTime" class="big">—</div></div>
+          <div class="stat"><div class="muted">Best time</div><div id="bestTime" class="big">—</div></div>
+          <div class="stat"><div class="muted">Average (last 5)</div><div id="avgTime" class="big">—</div></div>
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
+          <button id="instructionsBtn">How to play</button>
+          <button id="shareBtn">Share result</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn  = document.getElementById('stopBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const statusBox = document.getElementById('statusBox');
+  const lastTime  = document.getElementById('lastTime');
+  const bestTime  = document.getElementById('bestTime');
+  const avgTime   = document.getElementById('avgTime');
+  const roundCount = document.getElementById('roundCount');
+  const instructionsBtn = document.getElementById('instructionsBtn');
+  const shareBtn = document.getElementById('shareBtn');
+
+  let state = 'idle'; // idle | counting | waiting | ready | clicked | penalty
+  let startT = null;
+  let goT = null;
+  let timeoutId = null;
+  let rounds = 0;
+  const lastTimes = [];
+  const BEST_KEY = 'readymate_best_ms';
+
+  function setStatus(text, cls){
+    statusBox.className = 'status ' + (cls || '');
+    statusBox.innerHTML = text;
+  }
+
+  function format(ms){
+    if(ms === null || ms === undefined) return '—';
+    return (ms/1000).toFixed(3) + ' s';
+  }
+
+  function updateStats(ms, penalty=false){
+    rounds++;
+    roundCount.textContent = rounds;
+    if(!penalty){
+      lastTimes.unshift(ms);
+      if(lastTimes.length > 20) lastTimes.pop();
+      lastTime.textContent = format(ms);
+      // best
+      const prevBest = localStorage.getItem(BEST_KEY);
+      if(!prevBest || ms < +prevBest){
+        localStorage.setItem(BEST_KEY, ms);
+        bestTime.textContent = format(ms);
+      } else {
+        bestTime.textContent = format(+prevBest);
+      }
+      // average of last 5
+      const take = lastTimes.slice(0,5);
+      const avg = Math.round((take.reduce((a,b)=>a+b,0)/take.length) || 0);
+      avgTime.textContent = take.length? format(avg) : '—';
+    } else {
+      lastTime.textContent = 'False start';
+      // do not change best/avg
+    }
+  }
+
+  function clearPending(){
+    if(timeoutId) { clearTimeout(timeoutId); timeoutId = null; }
+  }
+
+  function startRound(){
+    clearPending();
+    state = 'counting';
+    setStatus('Get ready...', 'ready');
+    // short fixed countdown visual (3..2..1) then waiting with random delay
+    let c = 3;
+    setStatus('<div style="font-size:40px">' + c + '</div>', 'ready');
+    const cdInterval = setInterval(()=>{
+      c--;
+      if(c>0){
+        setStatus('<div style="font-size:40px">' + c + '</div>', 'ready');
+      } else {
+        clearInterval(cdInterval);
+        // random wait 600ms - 2200ms
+        const rand = 600 + Math.floor(Math.random()*1600);
+        state = 'waiting';
+        setStatus('Wait for it...', 'waiting');
+        timeoutId = setTimeout(()=> {
+          state = 'ready';
+          goT = performance.now();
+          setStatus('GO! — click or press Space', 'go');
+        }, rand);
+      }
+    }, 700);
+  }
+
+  function falseStart(){
+    clearPending();
+    state = 'penalty';
+    setStatus('Too soon! False Start', 'bad');
+    // small penalty delay
+    timeoutId = setTimeout(()=> {
+      state = 'idle';
+      setStatus('Press Start to try again');
+    }, 900);
+    updateStats(null, true);
+  }
+
+  function recordClick(){
+    if(state !== 'ready') {
+      if(state === 'waiting' || state === 'counting') {
+        falseStart();
+      }
+      return;
+    }
+    const ms = Math.round(performance.now() - goT);
+    state = 'clicked';
+    setStatus('<div style="font-size:28px">Your time: <strong>' + format(ms) + '</strong></div>');
+    updateStats(ms, false);
+    // small pause before allowing next round
+    timeoutId = setTimeout(()=> {
+      state = 'idle';
+      setStatus('Press Start to play again');
+    }, 900);
+  }
+
+  // initialize best from storage
+  (function init(){
+    const prevBest = localStorage.getItem(BEST_KEY);
+    if(prevBest) bestTime.textContent = format(+prevBest);
+    else bestTime.textContent = '—';
+  })();
+
+  // event handlers
+  startBtn.addEventListener('click', ()=>{
+    if(state === 'waiting' || state === 'counting' || state === 'ready') return;
+    startRound();
+  });
+
+  stopBtn.addEventListener('click', ()=>{
+    clearPending();
+    state = 'idle';
+    setStatus('Stopped — Press Start to play');
+  });
+
+  resetBtn.addEventListener('click', ()=>{
+    localStorage.removeItem(BEST_KEY);
+    bestTime.textContent = '—';
+  });
+
+  // clicking the status box counts as your reaction click
+  statusBox.addEventListener('click', recordClick);
+  document.addEventListener('keydown', (e)=>{
+    if(e.code === 'Space'){
+      e.preventDefault();
+      if(state === 'idle') startRound();
+      else recordClick();
+    } else if(e.key === 'r' || e.key === 'R'){
+      resetBtn.click();
+    }
+  });
+  // also treat pointerdown globally for mobile quick reaction
+  document.addEventListener('pointerdown', (e)=>{
+    // avoid interfering with UI buttons
+    const tag = e.target.tagName.toLowerCase();
+    if(tag === 'button' || e.target.closest('button')) return;
+    recordClick();
+  });
+
+  instructionsBtn.addEventListener('click', ()=>{
+    alert(
+`How to play ReadyMate:
+1) Press Start (or Space) — countdown 3..2..1.
+2) Wait until the screen shows GO!
+3) Click the big area or press Space as fast as you can.
+Avoid clicking before GO! (that's a false start).
+Your best time is saved locally in this browser.`
+    );
+  });
+
+  shareBtn.addEventListener('click', ()=>{
+    const b = localStorage.getItem(BEST_KEY);
+    const best = b ? (Math.round(b)/1000).toFixed(3) + ' s' : '—';
+    const txt = `My ReadyMate best reaction time: ${best} — can you beat it?`;
+    if(navigator.share){
+      navigator.share({title:'ReadyMate score', text:txt}).catch(()=>{});
+    } else {
+      // fallback: copy to clipboard
+      navigator.clipboard?.writeText(txt).then(()=> alert('Result copied to clipboard:\n' + txt)).catch(()=> alert(txt));
+    }
+  });
+
+  // accessibility hint: focus the Start button
+  startBtn.focus();
+})();
+</script>
+</body>
+</html>
