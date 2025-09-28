@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz - CodeFixer.AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fafb;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    #quiz-container {
+      max-width: 700px;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      width: 100%;
+    }
+    h2 {
+      margin-top: 0;
+      font-weight: 600;
+    }
+    h3 {
+      margin-bottom: 10px;
+    }
+    ul.options {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul.options li {
+      margin-bottom: 15px;
+    }
+    ul.options button {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #3b82f6;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    ul.options button:hover {
+      background-color: #2563eb;
+    }
+    #progress {
+      font-size: 14px;
+      margin-bottom: 20px;
+      color: #6b7280;
+    }
+    #score {
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+
+  <!-- Firebase Styles & SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBI5jDcA_QNrujfn0cI5-IHUtZlGm8Q6X0",
+      authDomain: "codefixer-ai.firebaseapp.com",
+      projectId: "codefixer-ai",
+      storageBucket: "codefixer-ai.firebasestorage.app",
+      messagingSenderId: "591922324510",
+      appId: "1:591922324510:web:77dd4480a11b9e2fddfa0f",
+      measurementId: "G-ZMNCWK2XHD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+</head>
+<body>
+
+<div id="quiz-container">
+  <h2>Loading...</h2>
+</div>
+
+<script>
+  const quizContainer = document.getElementById('quiz-container');
+  const params = new URLSearchParams(window.location.search);
+  const quizId = params.get('quizId');
+
+  let questions = [];
+  let currentQuestionIndex = 0;
+  let score = 0;
+
+  async function loadQuizQuestions(id) {
+    quizContainer.innerHTML = '<h2>Loading questions...</h2>';
+    try {
+      const snapshot = await db.collection('quizzes').doc(id).collection('questions').get();
+      questions = snapshot.docs.map(doc => doc.data());
+      currentQuestionIndex = 0;
+      score = 0;
+      showQuestion();
+    } catch (err) {
+      quizContainer.innerHTML = '<p>Failed to load quiz questions.</p>';
+      console.error(err);
+    }
+  }
+
+  function showQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+      quizContainer.innerHTML = `
+        <h2>Quiz Completed!</h2>
+        <div id="score">Your score: ${score} / ${questions.length}</div>
+      `;
+      return;
+    }
+
+    const q = questions[currentQuestionIndex];
+    let optionsHtml = '';
+    q.options.forEach((opt, idx) => {
+      optionsHtml += `<li><button onclick="checkAnswer(${idx})">${opt}</button></li>`;
+    });
+
+    quizContainer.innerHTML = `
+      <div id="progress">Question ${currentQuestionIndex + 1} of ${questions.length}</div>
+      <h3>${q.question_text}</h3>
+      <ul class="options">${optionsHtml}</ul>
+    `;
+  }
+
+  window.checkAnswer = function(selected) {
+    if (selected === questions[currentQuestionIndex].answer) {
+      score++;
+      alert('Correct!');
+    } else {
+      alert('Wrong answer!');
+    }
+    currentQuestionIndex++;
+    showQuestion();
+  };
+
+  if (quizId) {
+    loadQuizQuestions(quizId);
+  } else {
+    quizContainer.innerHTML = '<p>No quiz selected. Please go back and choose a quiz.</p>';
+  }
+</script>
+
+</body>
+</html>
