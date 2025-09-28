@@ -947,3 +947,11 @@ footer {
     max-width: 97vw;
   }
 }
+
+.btn-container {
+  display: flex;
+  gap: 20px;      /* Adds a visible gap between buttons */
+  margin-top: 10px;
+}
+
+
