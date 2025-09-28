@@ -5,10 +5,13 @@
   <title>Quizzes | CodeFixer.AI</title>
   <link rel="stylesheet" href="style.css">
 </head>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<button class="start-quiz-btn" data-quiz="python">Start Quiz</button>
-<button class="start-quiz-btn" data-quiz="js">Start Quiz</button>
-<button class="start-quiz-btn" data-quiz="debugger">Start Quiz</button>
+<!-- Your custom script -->
+<script src="script.js"></script>
 
 
 <body>
@@ -19,12 +22,14 @@
         <ul>
           <nav>
   <ul>
-    <li><a href="profile.html">Profile</a></li>
-    <li><a href="home.html">Dashboard</a></li>
-    <li><a href="code-debugger.html">Code Debugger</a></li>
-    <li><a href="quizzes.html">Quizzes</a></li>
-    <li><a href="learn.html">Code Learning</a></li>
-    <li><a href="#" id="logout-btn">Logout</a></li>
+     <li><a href="profile.html">Profile</a></li>
+          <li><a href="home.html">Dashboard</a></li>
+          <li><a href="code-debugger.html">Code Debugger</a></li>
+          <li><a href="quizzes.html">Quizzes</a></li>
+          <li><a href="learn.html">Code Learning</a></li>
+          <li><a href="challenges.html">Challenges</a></li>
+          <li><a href="game.html">Games</a></li>
+          <li><a href="#" id="logout-btn">Logout</a></li>
   </ul>
 </nav>
 
